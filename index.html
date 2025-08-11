@@ -329,36 +329,42 @@
     })();
 
     // ---- Simple visit counter --------------------------------------------
-  // ---- Simple visit counter --------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const visitsEl = document.getElementById('visits');
-    if (!visitsEl) return;
+    const el = document.getElementById('visits');
+    if (!el) return;
 
     const namespace = 'cyprusweather.info';
     const key = location.hostname || 'local';
+    const locale = 'el-CY';
 
-    fetch(
+    const endpoints = [
       `https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`,
-      { cache: 'no-store' }
-    )
-      .then((r) => {
-        if (!r.ok) throw new Error(r.statusText);
-        return r.json();
-      })
-      .then((d) => {
-        if (d && Number.isFinite(d.value)) {
-          visitsEl.textContent = Number(d.value).toLocaleString('el-CY');
-        } else {
-          visitsEl.textContent = '—';
+      `https://abacus.jasoncameron.dev/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`
+    ];
+
+    (async () => {
+      for (const url of endpoints) {
+        try {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), 4000); // timeout 4s
+          const r = await fetch(url, { cache: 'no-store', signal: ctrl.signal });
+          clearTimeout(t);
+          if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+          const d = await r.json();
+          if (d && Number.isFinite(d.value)) {
+            el.textContent = Number(d.value).toLocaleString(locale);
+            return;
+          }
+        } catch (e) {
+          // try next endpoint
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        visitsEl.textContent = '—';
-      });
+      }
+      el.textContent = '—';
+    })();
   });
   </script>
 </body>
 </html>
+
 
 
