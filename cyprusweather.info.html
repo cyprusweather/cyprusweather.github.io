@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forecast and Cyprus Weather Providers</title>
+  <meta name="description" content="Forecast and weather providers for Cyprus." />
+  <link rel="icon" href="icons/cyprusweatherinfo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/cyprusweatherinfo.png" />
+  <link rel="canonical" href="https://cyprusweather.info/" />
+  <meta name="robots" content="index,follow" />
+  <meta property="og:title" content="Cyprus Weather Providers" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cyprusweather.info/" />
+  <meta property="og:site_name" content="CyprusWeather.info" />
+  <meta property="og:locale" content="el_CY" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root { --bg:#0a2342; --surface:#151719; --muted:#9aa1a9; --text:#e5e7eb; --primary:#9ca3af; --primary-2:#6b7280; --card:#1b1d1f; --chip:#232527; --shadow:0 10px 30px rgba(0,0,0,.25); --radius:18px; }
+    @media (prefers-color-scheme: light){ :root{ --bg:#e0e7ef; --surface:#ffffff; --card:#ffffff; --text:#111827; --muted:#6b7280; --chip:#f3f4f6; --shadow:0 6px 20px rgba(2,6,23,.08);} }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:linear-gradient(180deg,var(--bg),#0f1113 40%); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    header{ border-bottom:1px solid rgba(148,163,184,.15); }
+    .wrap{ max-width:960px; margin:0 auto; padding:16px; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .logo{ width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background: radial-gradient(120% 120% at 20% 20%, var(--primary), var(--primary-2)); color:#fff; font-weight:800; letter-spacing:.5px; box-shadow:var(--shadow); overflow:hidden }
+    .logo img{ width:100%; height:100%; object-fit:cover }
+    .title{ font-size:20px; font-weight:800; } .subtitle{ color:var(--muted); font-size:13px }
+
+    main{ padding:16px 0 48px }
+    .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); padding-bottom:0 }
+    .card{ background:var(--card); border:1px solid rgba(148,163,184,.15); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:grid; grid-template-columns:88px 1fr; gap:14px; align-items:center; transition:transform .2s ease, box-shadow .2s ease }
+    .card:hover{ transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,0,0,.3) }
+
+    .logo-badge{ width:72px; height:72px; border-radius:16px; display:grid; place-items:center; overflow:hidden; background:#ffffff; border:1px solid rgba(148,163,184,.25) }
+    .logo-badge img{ width:100%; height:100%; object-fit:contain; padding:8px }
+    .provider h3{ margin:0; font-size:18px }
+    .provider .desc{ margin-top:6px; font-size:13px; color:var(--muted) }
+    .links{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid rgba(148,163,184,.25); background:var(--chip); font-size:12px; color:var(--text); text-decoration:none; transition: border-color .2s ease, background-color .2s ease }
+    .badge svg{ width:16px; height:16px }
+    .badge:hover{ border-color:rgba(148,163,184,.45) }
+    .badge:focus-visible{ outline:3px solid var(--primary); outline-offset:2px }
+
+    .section-title{ margin:16px 0 8px; font-weight:800; font-size:16px }
+    #alerts{ margin:8px 0 16px; }
+    .alert{ background:#2b1d1d; border:1px solid rgba(220,38,38,.35); color:#fecaca; padding:12px; border-radius:12px; box-shadow:var(--shadow); }
+    .forecast-row{ display:grid; gap:16px; grid-template-columns:repeat(3,1fr); padding-bottom:0 }
+    .city{ background:var(--card); border:1px solid rgba(148,163,184,.15); border-radius:16px; padding:14px; box-shadow:var(--shadow) }
+    .city-header{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px }
+    .city h4{ margin:0; font-size:15px }
+    .current{ display:flex; align-items:baseline; gap:8px }
+    .current .t{ font-size:22px; font-weight:800 }
+    .current .cond{ color:var(--muted); font-size:12px }
+    .metrics{ display:flex; gap:10px; margin:6px 0 10px }
+    .metric{ background:var(--chip); border:1px solid rgba(148,163,184,.2); border-radius:10px; padding:6px 8px; font-size:12px }
+    .mini-days{ display:grid; grid-template-columns:1fr; gap:6px }
+    .mini-day{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; padding:6px 0; border-top:1px dashed rgba(148,163,184,.2) }
+    .mini-day:first-child{ border-top:none }
+    .mini-day .left{ display:flex; align-items:center; gap:8px }
+    .mini-day .w{ width:18px; height:18px }
+    .muted{ color:var(--muted); font-size:12px }
+    .search{ display:flex; gap:8px; margin:8px 0 12px }
+    .input{ flex:1; padding:8px 10px; border-radius:10px; border:1px solid rgba(148,163,184,.25); background:var(--chip); color:var(--text) }
+    .input::placeholder{ color:var(--muted) }
+    .btn{ padding:8px 12px; border-radius:10px; border:1px solid rgba(148,163,184,.25); background:var(--chip); color:var(--text); cursor:pointer }
+    .btn:hover{ border-color:rgba(148,163,184,.45) }
+
+    .divider{ height:12px }
+    footer{ border-top:1px solid rgba(148,163,184,.15); margin-top:28px }
+    .foot{ display:grid; gap:8px; padding:18px 0; color:var(--muted); font-size:12px }
+    #visit-wrap{ color:var(--text); font-weight:600 }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><img src="icons/cyprusweatherinfo.png" alt="CyprusWeather.info logo" loading="lazy" decoding="async" width="40" height="40" /></div>
+        <div>
+          <div class="title">Πρόγνωση Καιρού και Πάροχοι στην Κύπρο</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="grid" class="grid" role="list"></div>
+    <div class="divider" role="separator" aria-hidden="true"></div>
+    <section id="alerts" aria-live="polite"></section>
+    <section id="forecast">
+      <form id="search" class="search" role="search" aria-label="Search Cyprus locations">
+        <input id="q" class="input" type="search" placeholder="Αναζήτηση περιοχής" />
+        <button class="btn" type="submit">Αναζήτηση</button>
+      </form>
+      <div id="forecast-row" class="forecast-row" role="list"></div>
+    </section>
+    <footer>
+      <div class="foot wrap">
+        <div>© <span id="year"></span> CyprusWeather.info — community project.</div>
+        <div>Σημείωση: Τα λογότυπα/περιεχόμενο ανήκουν στους αντίστοιχους παρόχους. Η πλατφόρμα προβάλλει πηγές με σαφή απόδοση.</div>
+        <div id="visit-wrap">Επισκέψεις: <span id="visits">—</span></div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // ---- Data (μόνο links) -------------------------------------------------
+    const providers = [
+      {
+        id: 'dom',
+        name: 'Τμήμα Μετεωρολογίας',
+        description: 'Το Τμ. Μετεωρολογίας Κύπρου είναι η Εθνική Μετεωρολογική Υπηρεσία της Κυπριακής Δημοκρατίας. Αποτελεί μέρος του ΥΓΑΑΠ και είναι το αρμόδιο Τμήμα για την παρακολούθηση και πρόγνωση των καιρικών συνθηκών στην Κύπρο.',
+        url: 'https://www.moa.gov.cy/moa/dm/dm.nsf/home/home?openform',
+        logo: 'icons/dm-logo.jpg',
+        facebook: 'https://www.facebook.com/profile.php?id=61560061924845',
+        twitter: 'https://x.com/CyMeteorology',
+        phone: '22 802934',
+        email: 'metservice@dom.moa.gov.cy',
+        youtube: '',
+        order: 0
+      },
+      {
+        id: 'kitas',
+        name: 'KitasWeather',
+        description: 'Το kitasweather.com είναι μετεωρολογική πλατφόρμα η οποία παρέχει πρόγνωση, ενημέρωση και πληροφόρηση σε σχέση με τις καιρικές συνθήκες στην Κύπρο, και περιστασιακές αναφορές σε άλλες περιοχές του κόσμου.',
+        url: 'https://www.kitasweather.com',
+        logo: 'icons/kitasweather-logo.png',
+        facebook: 'https://www.facebook.com/kitasweather',
+        youtube: 'https://www.youtube.com/@kitasweather5481',
+        email: 'eric@kitasweather.com',
+        order: 1
+      },
+      {
+        id: 'tasos',
+        name: 'Weather Forecast Cyprus by TASOS IERODIAKONOU',
+        description: 'Το TASOS IERODIAKONOU είναι ένας επαγγελματίας μετεωρολόγος και προγραμματιστής που δημιουργεί προγνώσεις καιρού για την Κύπρο και τις περιοχές της Κύπρου.',
+        url: 'https://www.wfcyp.com',
+        logo: 'icons/ierodiakonou-logo.jpg',
+        facebook: 'https://www.facebook.com/ierodiakonouweatherforecast',
+        order: 2
+      },
+      {
+        id: 'cwo',
+        name: 'Cyprus Weather Online',
+        description: 'Το Cyprus Weather Online είναι μια ιστοσελίδα που παρέχει πρόγνωση καιρού για την Κύπρο και τις περιοχές της Κύπρου.',
+        url: 'https://www.cyprus-weatheronline.com/',
+        logo: 'icons/cyprusweatheronline.png',
+        facebook: 'https://www.facebook.com/groups/599679756747556',
+        order: 3
+      },
+      {
+        id: 'cyprusnet',
+        name: 'cyprus-weather.com',
+        description: 'Cyprus Weather offers detailed weather conditions and weather forecast for the island of Cyprus. It is a CyprusNet portal developed to keep visitors and Cypriots alike, informed on the weather in Cyprus and the climatic changes throughout the day, along with a five-day forecast for all major cities and other locations.',
+        url: 'https://www.cyprus-weather.com/',
+        logo: 'icons/cyprusnet.jpg',
+        order: 4
+      },
+      {
+        id: 'cyprusweatherorg',
+        name: 'cyprus-weather.org',
+        description: 'Cyprus-Weather.org provides real-time weather information, both current and forecast, for all major locations in Cyprus.',
+        url: 'https://www.cyprus-weather.org/',
+        logo: 'icons/cyprusweatherorg.png',
+        order: 5
+      }
+    ];
+
+    // ---- Icons -------------------------------------------------------------
+    function fbIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M22 12.06C22 6.48 17.52 2 11.94 2S2 6.48 2 12.06c0 5.01 3.66 9.16 8.44 10v-7.07H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.62.77-1.62 1.56V12h2.76l-.44 2.99h-2.32V22c4.78-.84 8.44-4.99 8.44-9.94Z"/>'; return i; }
+    function ytIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M23.5 6.2s-.2-1.6-.8-2.3c-.8-.9-1.7-.9-2.1-.9C17.9 2.7 12 2.7 12 2.7h0s-5.9 0-8.6.3c-.5 0-1.3 0-2.1.9-.6.7-.8 2.3-.8 2.3S-0 8.1-0 10v1.9c0 1.9.2 3.8.2 3.8s.2 1.6.8 2.3c.8.9 1.9.9 2.4 1 1.8.2 7.6.3 7.6.3s5.9 0 8.6-.3c.5-.1 1.3-.1 2.1-1 .6-.7.8-2.3.8-2.3s.2-1.9.2-3.8V10c0-1.9-.2-3.8-.2-3.8ZM9.6 13.7V8.3l5.7 2.7-5.7 2.7Z"/>'; return i; }
+    function linkIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M3.9 12a4.1 4.1 0 0 1 4.1-4.1h4v2h-4a2.1 2.1 0 1 0 0 4.2h4v2h-4A4.1 4.1 0 0 1 3.9 12Zm6-1h4v2h-4v-2Zm6.1-3.1h-4v2h4a2.1 2.1 0 1 1 0 4.2h-4v2h4a4.1 4.1 0 0 0 0-8.2Z"/>'; return i; }
+    function twIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.48 11.24H16.17l-5.3-6.933-6.06 6.933H1.49l7.73-8.84L1 2.25h7.08l4.78 6.32 5.384-6.32Zm-1.161 18.5h1.833L7.01 4.126H5.05L17.083 20.75Z"/>'; return i; }
+    function mailIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm0 2v.2l8 4.8 8-4.8V8H4Zm16 8V10l-8 4.8L4 10v6h16Z"/>'; return i; }
+    function phoneIcon(){ const i=document.createElementNS('http://www.w3.org/2000/svg','svg'); i.setAttribute('viewBox','0 0 24 24'); i.innerHTML='<path fill="currentColor" d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C11.4 21 3 12.6 3 2a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.2 2.2Z"/>'; return i; }
+
+    function logoNode(p){
+      const badge = document.createElement('div'); badge.className='logo-badge';
+      if(p.logo){
+        const img = new Image(); img.alt = p.name + ' logo'; img.src = p.logo; img.loading='lazy'; img.decoding='async'; img.width=72; img.height=72;
+        img.onerror = () => {
+          if (img.parentNode) img.parentNode.removeChild(img);
+          const ph = document.createElement('div');
+          ph.textContent = p.name.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase();
+          ph.style.display='grid'; ph.style.placeItems='center'; ph.style.width='100%'; ph.style.height='100%'; ph.style.color='#111827'; ph.style.fontWeight='800';
+          badge.appendChild(ph);
+        };
+        badge.appendChild(img);
+      }
+      else { const ph = document.createElement('div'); ph.textContent = p.name.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase(); ph.style.display='grid'; ph.style.placeItems='center'; ph.style.width='100%'; ph.style.height='100%'; ph.style.color='#111827'; ph.style.fontWeight='800'; badge.appendChild(ph); }
+      return badge;
+    }
+
+    function providerCard(p){
+      const card=document.createElement('article'); card.className='card'; card.role='listitem';
+      const left=document.createElement('div'); left.appendChild(logoNode(p)); card.appendChild(left);
+      const body=document.createElement('div'); body.className='provider';
+      const h=document.createElement('h3'); h.textContent=p.name; body.appendChild(h);
+      if(p.description){ const d=document.createElement('p'); d.className='desc'; d.textContent=p.description; body.appendChild(d); }
+      const links=document.createElement('div'); links.className='links';
+      if(p.url){ const a=document.createElement('a'); a.className='badge'; a.href=p.url; a.target='_blank'; a.rel='noopener noreferrer'; a.appendChild(linkIcon()); a.append(' Website'); links.appendChild(a); }
+      if(p.phone){ const a=document.createElement('a'); a.className='badge'; const digits=(p.phone||'').replace(/\D/g,''); const tel=digits.length===8?('+357'+digits):(p.phone.trim().startsWith('+')?p.phone.trim():digits); a.href='tel:'+tel; a.appendChild(phoneIcon()); a.append(' '+p.phone); links.appendChild(a); }
+      if(p.email){ const a=document.createElement('a'); a.className='badge'; a.href='mailto:'+p.email; a.appendChild(mailIcon()); a.append(' '+p.email); links.appendChild(a); }
+      if(p.facebook){ const a=document.createElement('a'); a.className='badge'; a.href=p.facebook; a.target='_blank'; a.rel='noopener noreferrer'; a.appendChild(fbIcon()); a.append(' Facebook'); links.appendChild(a); }
+      if(p.twitter){ const a=document.createElement('a'); a.className='badge'; a.href=p.twitter; a.target='_blank'; a.rel='noopener noreferrer'; a.appendChild(twIcon()); a.append(' Twitter'); links.appendChild(a); }
+      if(p.youtube){ const a=document.createElement('a'); a.className='badge'; a.href=p.youtube; a.target='_blank'; a.rel='noopener noreferrer'; a.appendChild(ytIcon()); a.append(' YouTube'); links.appendChild(a); }
+      body.appendChild(links);
+      card.appendChild(body);
+      return card;
+    }
+
+    function render(){
+      const grid=document.getElementById('grid'); grid.innerHTML='';
+      providers.slice().sort((a,b)=> ((a.order ?? 1) - (b.order ?? 1)) || a.name.localeCompare(b.name, 'el')).forEach(p=> grid.appendChild(providerCard(p)) );
+      document.getElementById('year').textContent=new Date().getFullYear();
+    }
+
+    render();
+
+    // ---- Forecast & Alerts -------------------------------------------------
+    (async function(){
+      const cities = [
+        { id:'nicosia', name:'Λευκωσία', lat:35.1738, lon:33.3642 },
+        { id:'limassol', name:'Λεμεσός', lat:34.6781, lon:33.0416 },
+        { id:'larnaca', name:'Λάρνακα', lat:34.9229, lon:33.6290 },
+        { id:'paphos', name:'Πάφος', lat:34.7750, lon:32.4297 },
+        { id:'ayianapa', name:'Αγία Νάπα', lat:34.9800, lon:34.0010 },
+        { id:'troodos', name:'Τρόοδος', lat:34.9167, lon:32.8333 }
+      ];
+      const forecastEl = document.getElementById('forecast-row');
+      const alertsEl = document.getElementById('alerts');
+
+      const WMO = {
+        0:['Αίθριος','M0'],1:['Κυρίως αίθριος','M1'],2:['Μερική νέφωση','M2'],3:['Συννεφιά','M3'],
+        45:['Ομίχλη','M4'],48:['Παγετός','M5'],51:['Ψιλή βροχή','M6'],53:['Ψιλή βροχή','M6'],55:['Ψιλή βροχή','M6'],
+        56:['Παγωμένη ψιλή βροχή','M7'],57:['Παγωμένη ψιλή βροχή','M7'],61:['Βροχή','M8'],63:['Βροχή','M8'],65:['Ισχυρή βροχή','M9'],
+        66:['Παγωμένη βροχή','M10'],67:['Παγωμένη βροχή','M10'],71:['Χιονόπτωση','M11'],73:['Χιονόπτωση','M11'],75:['Ισχυρή χιονόπτωση','M12'],
+        77:['Νιφάδες','M13'],80:['Μπόρες','M14'],81:['Μπόρες','M14'],82:['Ισχυρές μπόρες','M15'],95:['Καταιγίδα','M16'],96:['Καταιγίδα','M16'],99:['Χαλαζόπτωση','M17']
+      };
+      function degToCompass(deg){ const dirs=['Β','ΒΒΑ','ΒΑ','ΑΒΑ','Α','ΑΝΑ','ΑΝ','ΑΝΔ','Ν','ΝΝΔ','ΝΔ','ΔΝΔ','Δ','ΔΒΔ','ΔΒ','ΒΔΒ']; return dirs[Math.round(deg/22.5)%16] }
+      function codeLabel(code){ return (WMO[code]||['—'])[0] }
+      function iconSvg(code){
+        // Minimal inline icons by category
+        const cloudy = '<svg class="w" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h11a4 4 0 0 0 0-8 6 6 0 0 0-11.3-2.5A4.5 4.5 0 0 0 6 19Z"/></svg>';
+        const sun = '<svg class="w" viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm0-14V2m0 20v-2M4 12H2m20 0h-2M5.64 5.64 4.22 4.22m15.56 15.56-1.42-1.42m0-14.14 1.42-1.42M4.22 19.78l1.42-1.42" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+        const rain = '<svg class="w" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18h11a4 4 0 0 0 0-8 6 6 0 0 0-11.3-2.5A4.5 4.5 0 0 0 6 18Z"/><path d="M8 20l-1 2m4-2-1 2m4-2-1 2" stroke="currentColor" stroke-width="2"/></svg>';
+        const storm = '<svg class="w" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h11a4 4 0 0 0 0-8 6 6 0 0 0-11.3-2.5A4.5 4.5 0 0 0 6 17Z"/><path d="M11 22l2-4h-3l2-4"/></svg>';
+        const snow = '<svg class="w" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v18M4.9 7.1l14.2 9.8M4.9 16.9l14.2-9.8" stroke="currentColor" stroke-width="2"/></svg>';
+        if([0,1].includes(code)) return sun; if([2,3,45,48].includes(code)) return cloudy; if([61,63,65,80,81,82,51,53,55,56,57].includes(code)) return rain; if([95,96,99].includes(code)) return storm; if([71,73,75,77].includes(code)) return snow; return cloudy;
+      }
+      function fmtDay(iso){ const d=new Date(iso+'T12:00:00'); return d.toLocaleDateString('el-CY',{weekday:'short', day:'2-digit'}) }
+
+      async function fetchCity(city){
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max,winddirection_10m_dominant&timezone=auto&forecast_days=5`;
+        const r=await fetch(url); if(!r.ok) throw new Error('forecast'); return r.json();
+      }
+      function renderCity(city, data){
+        const c=document.createElement('div'); c.className='city'; c.role='listitem';
+        // header
+        const head=document.createElement('div'); head.className='city-header';
+        const name=document.createElement('h4'); name.textContent=city.name; head.appendChild(name);
+        const cur=document.createElement('div'); cur.className='current';
+        cur.innerHTML = `<span class="t">${Math.round(data.current.temperature_2m)}°C</span><span class="cond">${codeLabel(data.current.weathercode)}</span>`;
+        head.appendChild(cur); c.appendChild(head);
+        // metrics
+        const m=document.createElement('div'); m.className='metrics';
+        m.innerHTML = `<div class="metric">Άνεμος: ${Math.round(data.current.wind_speed_10m)} km/h ${degToCompass(data.current.wind_direction_10m)}</div><div class="metric">Υγρασία: ${Math.round(data.current.relative_humidity_2m)}%</div>`;
+        c.appendChild(m);
+        // 5-day mini
+        const days=document.createElement('div'); days.className='mini-days';
+        for(let i=0;i<data.daily.time.length;i++){
+          const row=document.createElement('div'); row.className='mini-day';
+          const left=document.createElement('div'); left.className='left';
+          const icon=document.createElement('div'); icon.innerHTML=iconSvg(data.daily.weathercode[i]); left.appendChild(icon);
+          const when=document.createElement('div'); when.textContent=fmtDay(data.daily.time[i]); left.appendChild(when);
+          row.appendChild(left);
+          const right=document.createElement('div'); right.className='right'; right.innerHTML = `<strong>${Math.round(data.daily.temperature_2m_max[i])}°/${Math.round(data.daily.temperature_2m_min[i])}°C</strong> <span class="muted">· ${data.daily.precipitation_probability_max[i]??0}% βροχή · ${Math.round(data.daily.windspeed_10m_max[i])} km/h</span>`; row.appendChild(right);
+          days.appendChild(row);
+        }
+        c.appendChild(days);
+        forecastEl.appendChild(c);
+      }
+
+      try{
+        const results = await Promise.allSettled(cities.map(c=> fetchCity(c)));
+        results.forEach((r,idx)=>{ if(r.status==='fulfilled'){ renderCity(cities[idx], r.value); } });
+      }catch{}
+
+      // MET alerts for Cyprus
+      try{
+        const ares = await fetch('https://api.met.no/weatherapi/metalerts/2.0/all.json?country=CY');
+        if(ares.ok){
+          const aj = await ares.json();
+          const active = (aj.features||[]).filter(f=> f && f.properties && f.properties.status==='Actual');
+          if(active.length){
+            const div=document.createElement('div'); div.className='alert';
+            const p=active[0].properties; const t=p.event || 'Προειδοποίηση καιρού';
+            const lvl=p.severity?` (${p.severity})`:''; const desc=p.description||'';
+            div.textContent = `${t}${lvl}: ${desc}`;
+            alertsEl.appendChild(div);
+          }
+        }
+      }catch{}
+
+      // Search Cyprus locations (Open-Meteo geocoding) and render card
+      const form=document.getElementById('search');
+      const q=document.getElementById('q');
+      async function geocode(query){
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&language=el&count=1&format=json&country=CY`;
+        const r=await fetch(url); if(!r.ok) throw new Error('geocode'); return r.json();
+      }
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault(); const query=(q.value||'').trim(); if(!query) return;
+        try{
+          const g=await geocode(query);
+          const r=g && g.results && g.results[0];
+          if(r){
+            const city={ id:`s-${r.id}`, name:`${r.name}${r.admin1?`, ${r.admin1}`:''}`, lat:r.latitude, lon:r.longitude };
+            const data=await fetchCity(city);
+            // Prepend searched result to appear first
+            const temp=document.createElement('div');
+            renderCity(city, data);
+            const row=document.getElementById('forecast-row');
+            const last=row.lastElementChild; if(last){ row.insertBefore(last, row.firstChild); }
+          }
+        }catch{}
+      });
+    })();
+
+    // ---- Simple visit counter --------------------------------------------
+    (function(){
+      const visitsEl = document.getElementById('visits');
+      const namespace = 'cyprusweather.info';
+      const key = location.hostname || 'local';
+      fetch(`https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`)
+        .then(r=>r.json()).then(d=>{
+          if(d && typeof d.value === 'number'){ visitsEl.textContent = d.value.toLocaleString('el-CY'); }
+        }).catch(()=>{
+          visitsEl.textContent = '—';
+        });
+    })();
+  </script>
+</body>
+</html>
