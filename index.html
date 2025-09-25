@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Forecast and Cyprus Weather</title>
+  <title>Cyprus Weather</title>
   <meta name="description" content="Forecast and weather for Cyprus." />
   <link rel="icon" href="icons/cyprusweatherinfo.png" type="image/png" />
   <link rel="apple-touch-icon" href="icons/cyprusweatherinfo.png" />
@@ -70,7 +70,39 @@
     footer{ border-top:1px solid rgba(148,163,184,.15); margin-top:28px }
     .foot{ display:grid; gap:8px; padding:18px 0; color:var(--muted); font-size:12px }
     visit-wrap{ color:var(--text); font-weight:600 }
+    body { font-family: sans-serif; text-align: center; }
+    #controls { margin: 1em 0; }
+    button {
+      margin: 0.2em;
+      padding: 0.4em 0.8em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ddd;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+    }
   </style>
+</head>
+<body>
+
+<script>
+  const baseUrl = "https://embed.windy.com/embed.html"
+    + "?type=map&location=coordinates&zoom=8"
+    + "&product=ecmwf&level=surface"
+    + "&lat=34.906&lon=33.25";
+
+  function setOverlay(overlay) {
+    const frame = document.getElementById("windyFrame");
+    frame.src = baseUrl + "&overlay=" + overlay;
+  }
+</script>
 </head>
 <body>
   <header>
@@ -95,12 +127,30 @@
       </form>
       <div id="forecast-row" class="forecast-row" role="list"></div>
     </section><p>
-	Windy maps<p>
-	<iframe width="100%" height="450" src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=bft&zoom=8&overlay=rain&product=ecmwf&level=surface&lat=34.906&lon=33.25&detailLat=35.109&detailLon=33.269&detail=false&pressure=true&message=false" frameborder="0"></iframe>
 
-<iframe width="100%" height="450" src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=bft&zoom=8&overlay=temp&product=ecmwf&level=surface&lat=34.906&lon=33.25&detailLat=35.109&detailLon=33.269&detail=false&pressure=true&message=true" frameborder="0"></iframe>
+<div id="controls">
+  <button onclick="setOverlay('wind')">Wind</button>
+  <button onclick="setOverlay('gust')">Gusts</button>
+  <button onclick="setOverlay('temp')">Temperature</button>
+  <button onclick="setOverlay('rain')">Rain</button>
+  <button onclick="setOverlay('thunder')">Thunder</button>
+  <button onclick="setOverlay('clouds')">Clouds</button>
+  <button onclick="setOverlay('dewpoint')">Dewpoint</button>
+  <button onclick="setOverlay('rh')">Humidity</button>
+  <button onclick="setOverlay('soilMoisture40')">Soil Moisture</button>
+  <button onclick="setOverlay('drought40')">Drought</button>
+  <button onclick="setOverlay('waves')">Waves</button>
+  <button onclick="setOverlay('swell1')">Swell 1</button>
+  <button onclick="setOverlay('swell2')">Swell 2</button>
+  <button onclick="setOverlay('swell3')">Swell 3</button>
+  <button onclick="setOverlay('pressure')">Pressure</button>
+  <button onclick="setOverlay('visibility')">Visibility</button>
+  <button onclick="setOverlay('capAlerts')">CAP Alerts</button>
+</div>
 
-<iframe width="100%" height="450" src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=bft&zoom=8&overlay=drought40&product=ecmwf&level=surface&lat=34.906&lon=33.25&detailLat=35.109&detailLon=33.269&detail=false&pressure=true&message=true" frameborder="0"></iframe>
+<iframe id="windyFrame"
+  src="https://embed.windy.com/embed.html?type=map&location=coordinates&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=34.906&lon=33.25">
+</iframe>
     <footer>
       <div class="foot wrap">
         <div>© <span id="year"></span> CyprusWeather.info — community project.</div>
